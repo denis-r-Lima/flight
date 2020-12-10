@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useQuery, useMutation } from "@apollo/client"
 import {Link} from "react-router-dom"
 
@@ -13,11 +13,11 @@ import "./addFlight.css"
 const AddFlightPage: React.FC = () => {
   const [flightList, setFlightList] = useState<NewFlight[]>([])
 
-  const [origin, setOrigin] = useState<number>(NaN)
-  const [destination, setDestination] = useState<number>(NaN)
-  const [duration, setDuration] = useState<number>(NaN)
-  const [date, setDate] = useState<string>("")
-  const [time, setTime] = useState<string>("")
+  const origin = useRef<number>(NaN)
+  const destination = useRef<number>(NaN)
+  const duration = useRef<number>(NaN)
+  const date = useRef<string>("")
+  const time = useRef<string>("")
 
   const [airports, setAirports] = useState<Airports[]>([])
 
@@ -35,23 +35,28 @@ const AddFlightPage: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (isNaN(origin) || isNaN(destination) || date === "" || time === "" || isNaN(duration)) {
+    if (isNaN(origin.current) || isNaN(destination.current) || date.current === "" || time.current === "" || isNaN(duration.current)) {
       alert("Please fill all fields!")
       return
     }
-    setFlightList([
-      ...flightList,
+    setFlightList(current => [
+      ...current,
       new NewFlight(
-        origin,
-        airports[origin - 1].code,
-        destination,
-        airports[destination - 1].code,
-        duration,
-        `${date} ${time}`
+        origin.current,
+        airports[origin.current - 1].code,
+        destination.current,
+        airports[destination.current - 1].code,
+        duration.current,
+        `${date.current} ${time.current}`
       ),
     ])
     let form = e.target as HTMLFormElement
     form.reset()
+    origin.current = NaN
+    destination.current = NaN
+    duration.current = NaN
+    date.current = ""
+    time.current = ""
 
   }
 
@@ -92,7 +97,7 @@ const AddFlightPage: React.FC = () => {
               <select
                 name="Origin"
                 id="origin"
-                onChange={(e) => setOrigin(parseInt(e.target.value))}
+                onChange={(e) => origin.current = (parseInt(e.target.value))}
               >
                 <option value="zero"> </option>
                 {airports.length > 0 ? (
@@ -112,7 +117,7 @@ const AddFlightPage: React.FC = () => {
               <select
                 name="Origin"
                 id="destination"
-                onChange={(e) => setDestination(parseInt(e.target.value))}
+                onChange={(e) => destination.current =(parseInt(e.target.value))}
               >
                 <option value="zero"> </option>
                 {airports.length > 0 ? (
@@ -129,15 +134,15 @@ const AddFlightPage: React.FC = () => {
                 )}
               </select>
               <label htmlFor="date">Date:</label>
-              <input type="date" name="date" id="date" onChange={(e) => setDate(e.target.value)} />
+              <input type="date" name="date" id="date" onChange={(e) => date.current = (e.target.value)} />
               <label htmlFor="time">Time:</label>
-              <input type="time" name="time" id="time" onChange={(e) => setTime(e.target.value)} />
+              <input type="time" name="time" id="time" onChange={(e) => time.current = (e.target.value)} />
               <label htmlFor="duration">Duration:</label>
               <input
                 type="number"
                 name="duration"
                 id="duration"
-                onChange={(e) => setDuration(parseInt(e.target.value))}
+                onChange={(e) => duration.current = (parseInt(e.target.value))}
               />
               <Button type="submit" primary>Add Flight</Button>
             </form>

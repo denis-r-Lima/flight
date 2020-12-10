@@ -31,8 +31,10 @@ export const GET_FLIGHTS = gql`
       flight_id
       origin
       origin_city
+      origin_name
       destination
       destination_city
+      destination_name
       duration
       date
       time

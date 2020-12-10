@@ -11,10 +11,10 @@ export interface GetAirports {
 export interface Flights {
   flight_id: number
   origin: string
-  origin_name?: strings
+  origin_name: strings
   origin_city: string
   destination: string
-  destination_name?: string
+  destination_name: string
   destination_city: string
   duration: number
   date: string
@@ -39,9 +39,16 @@ export interface FlightCardProps {
   flight_id: number
   origin: string
   origin_city: string
+  origin_name: strings
   destination: string
   destination_city: string
+  destination_name: string
   duration: number
   date: string
   time: string
+}
+
+export interface MapModalProps {
+  origin: string
+  destination: string
 }

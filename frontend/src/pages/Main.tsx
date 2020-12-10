@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useQuery, useLazyQuery } from "@apollo/client"
 import { Link } from "react-router-dom"
 
@@ -6,48 +6,36 @@ import logo from "./images/air_line_full.png"
 import { Component, Head, Form, Button, Content, BackButton } from "./addStyle"
 import FlightCard from "./components/flightCard"
 import { Airports, GetAirports, SearchFlights, SearchVar, Flights } from "./src/interfaces"
+import MapModal from "./components/mapModal"
 
 import { GET_AIRPORTS, GET_FLIGHTS } from "./src/gqlQueries"
 
 const Main: React.FC = () => {
   const [airports, setAirports] = useState<Airports[]>([])
 
-  const [origin, setOrigin] = useState<string>("")
-  const [destination, setDestination] = useState<string>("")
-  const [date, setDate] = useState<string>("")
+  const origin = useRef<string>("")
+  const destination = useRef<string>("")
+  const date = useRef<string>("")
   const [flights, setFlights] = useState<Flights[]>([])
 
   const { loading, error, data: airportList } = useQuery<GetAirports>(GET_AIRPORTS)
 
-  if (loading) {
-  } else {
-    if (error) console.log(error)
-    if (airportList) {
-      if (airports.length === 0) {
-        setAirports(airportList.getAirports)
-      }
-    }
-  }
+  
 
   const [
     searchFlight,
     { loading: flightLoading, error: flightError, data: flightList, called },
   ] = useLazyQuery<SearchFlights>(GET_FLIGHTS)
 
-  if (flightLoading) {
-    console.log("loading")
-  } else {
-    if (flightError) console.log(flightError)
-  }
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     let variables: SearchVar = { variables: {} }
 
-    if (origin !== "") variables.variables.origin = origin
-    if (destination !== "") variables.variables.destination = destination
-    if (date !== "") variables.variables.date = date
+    if (origin.current !== "") variables.variables.origin = origin.current
+    if (destination.current !== "") variables.variables.destination = destination.current
+    if (date.current !== "") variables.variables.date = date.current
 
     searchFlight(variables)
   }
@@ -58,6 +46,23 @@ const Main: React.FC = () => {
     }
   }, [flightList , called])
 
+  if (loading) {
+    
+  } else {
+    if (error) console.log(error)
+    if (airportList) {
+      if (airports.length === 0) {
+        setAirports(airportList.getAirports)
+      }
+    }
+  }
+
+  if (flightLoading) {
+    
+  } else {
+    if (flightError)<div>Oh no! We gotta a error: {flightError}</div>
+  }
+
   return (
     <Component>
       <Head>
@@ -67,7 +72,7 @@ const Main: React.FC = () => {
         <Form>
           <form onSubmit={(e: React.FormEvent<HTMLFormElement>) => handleSubmit(e)}>
             <label htmlFor="origin">Origin:</label>
-            <select name="Origin" id="origin" onChange={(e) => setOrigin(e.target.value)}>
+            <select name="Origin" id="origin" onChange={(e) => origin.current = (e.target.value)}>
               <option value=""> </option>
               {airports.length > 0 ? (
                 airports.map((airport) => {
@@ -83,7 +88,7 @@ const Main: React.FC = () => {
               )}
             </select>
             <label htmlFor="destination">Destination:</label>
-            <select name="Origin" id="destination" onChange={(e) => setDestination(e.target.value)}>
+            <select name="Origin" id="destination" onChange={(e) => destination.current = (e.target.value)}>
               <option value=""> </option>
               {airports.length > 0 ? (
                 airports.map((airport) => {
@@ -99,7 +104,7 @@ const Main: React.FC = () => {
               )}
             </select>
             <label htmlFor="date">Date:</label>
-            <input type="date" name="date" id="date" onChange={(e) => setDate(e.target.value)} />
+            <input type="date" name="date" id="date" onChange={(e) => date.current = (e.target.value)} />
             <Button primary type="submit">
               Search
             </Button>
@@ -117,8 +122,10 @@ const Main: React.FC = () => {
                 duration={flight.duration}
                 origin={flight.origin}
                 origin_city={flight.origin_city}
+                origin_name={flight.origin_name}
                 destination={flight.destination}
                 destination_city={flight.destination_city}
+                destination_name={flight.destination_name}
                 key={flight.flight_id}
               />
             )
@@ -130,6 +137,7 @@ const Main: React.FC = () => {
       <Link to="/add">
         <BackButton>Add Flights &#10095;</BackButton>
       </Link>
+      <MapModal origin="t" destination="e"/>
     </Component>
   )
 }

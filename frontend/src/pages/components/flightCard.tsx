@@ -13,7 +13,7 @@ const FlightCard: React.FC<FlightCardProps> = (props) => {
             <Partition>{correctDateFormat(props.date, props.time)} </Partition>
         </Content>
         <Content>
-            <Partition>View on Maps</Partition>
+            <Partition><h4 onMouseOver={()=>console.log(props.origin_name)}>View on Maps</h4></Partition>
             <Partition>x-------------------------------------------------------------------&#10095;</Partition>
             <Partition>Duration: {correctDurationFormat(props.duration)}</Partition>
         </Content>
